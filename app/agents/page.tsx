@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Header } from '@/app/layout/Header';
 import { Footer } from '@/app/layout/Footer';
 import { Badge } from '@/components/ui/badge';
-import { PropertySearchFilter } from '@/components/property-search-filter';
+import { PropertySearchFilter } from '@/components/features/property/property-search-filter';
 
 // Mock agent data - replace with real data from your database
 const mockAgents = [

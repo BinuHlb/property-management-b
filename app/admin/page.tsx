@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Header } from '@/app/layout/Header';
 import { Footer } from '@/app/layout/Footer';
-import { PropertyList } from '@/components/property-list';
+import { PropertyList } from '@/components/features/property/property-list';
 import { PropertyFormDrawer } from '@/components/property-form-drawer';
 
 export default function AdminPage() {

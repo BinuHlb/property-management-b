@@ -32,9 +32,11 @@ export function CTAFindAgent() {
             </div>
           </div>
           <div className="flex-shrink-0 flex flex-col items-center md:items-end gap-2">
-            <p className="hidden md:block text-sm text-foreground/60 text-center md:text-right max-w-[200px]">
-              Get matched with the perfect agent for your needs
-            </p>
+            <div className="hidden md:block overflow-hidden w-[200px] relative h-5">
+              <p className="text-sm text-foreground/60 whitespace-nowrap animate-scroll absolute right-0">
+                Get matched with the perfect agent for your needs
+              </p>
+            </div>
             <Button 
               asChild
               className="bg-foreground text-background hover:bg-foreground/90"

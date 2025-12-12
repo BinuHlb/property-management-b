@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Header } from '@/app/layout/Header';
 import { Footer } from '@/app/layout/Footer';
-import { PropertyFilterSidebar } from '@/components/property-filter-sidebar';
+import { PropertyFilterSidebar } from '@/components/features/property/property-filter-sidebar';
 import {
   Sheet,
   SheetContent,
