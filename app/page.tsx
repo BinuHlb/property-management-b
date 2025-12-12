@@ -1,18 +1,26 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Search, Bed, Bath, Square, MapPin, ChevronRight, Building2, Home, Star } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Building2, TrendingUp, Key, DollarSign, Shield, Users, Briefcase, Home, Star, MapPin } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { supabase, type Property } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import { PropertyList } from '@/components/property-list';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from '@/components/ui/carousel';
+import { Header } from '@/app/layout/Header';
+import { Footer } from '@/app/layout/Footer';
+import { ContactSection } from '@/components/contact-section';
+import { AboutSection } from '@/components/about-section';
+import { CTAFindAgent } from '@/components/cta-find-agent';
+import { AnimatedLogo } from '@/components/animated-logo';
+import { PropertySearchFilter } from '@/components/property-search-filter';
+import { AppDownloadSection } from '@/components/app-download-section';
 
 export default function HomePage() {
   const [properties, setProperties] = useState<Property[]>([]);
@@ -21,14 +29,60 @@ export default function HomePage() {
   const [propertyType, setPropertyType] = useState('all');
   const [priceRange, setPriceRange] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null);
+  const [isHeroVisible, setIsHeroVisible] = useState(true);
+  const [scrollY, setScrollY] = useState(0);
+  const autoScrollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const heroSectionRef = useRef<HTMLElement>(null);
+  const parallaxBgRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchProperties();
   }, []);
 
   useEffect(() => {
+    const handleScroll = () => {
+      if (heroSectionRef.current) {
+        const rect = heroSectionRef.current.getBoundingClientRect();
+        const isVisible = rect.bottom > 0 && rect.top < window.innerHeight;
+        setIsHeroVisible(isVisible);
+        
+        // Parallax effect: move background slower than scroll
+        const scrollPosition = window.scrollY;
+        // Parallax speed factor (0.5 means background moves at half the scroll speed)
+        setScrollY(scrollPosition * 0.5);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Check initial state
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
     filterProperties();
   }, [properties, searchQuery, propertyType, priceRange]);
+
+  useEffect(() => {
+    if (!carouselApi) return;
+    if (autoScrollRef.current) {
+      clearInterval(autoScrollRef.current);
+    }
+    autoScrollRef.current = setInterval(() => {
+      if (!carouselApi) return;
+      const snaps = carouselApi.scrollSnapList();
+      if (!snaps.length) return;
+      const current = carouselApi.selectedScrollSnap();
+      const next = (current + 1) % snaps.length;
+      carouselApi.scrollTo(next);
+    }, 1800); // continuous forward auto-scroll
+    return () => {
+      if (autoScrollRef.current) {
+        clearInterval(autoScrollRef.current);
+      }
+    };
+  }, [carouselApi]);
 
   const fetchProperties = async () => {
     try {
@@ -81,275 +135,257 @@ export default function HomePage() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     filterProperties();
+    if (typeof window !== 'undefined') {
+      const target = document.getElementById('properties');
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
-      <nav className="border-b border-cyan-200/50 bg-white/80 backdrop-blur-md fixed w-full z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center">
-                <Building2 className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
-                PropSpace
-              </span>
+    <div className="min-h-screen bg-background">
+      <Header isDarkMode={isHeroVisible} />
+
+      <section
+        ref={heroSectionRef}
+        className="relative overflow-hidden pt-20 pb-16 px-4 sm:px-6 lg:px-8 text-white"
+      >
+        {/* Background image and overlays */}
+        <div
+          ref={parallaxBgRef}
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ 
+            backgroundImage: 'url("/assets/media/banner-bg.png")',
+            willChange: 'transform',
+            transform: `translateY(${scrollY * 0.5}px)`,
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-slate-900/80" />
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* Hero Title with Logo Animation */}
+          <div className="text-center my-8">
+            <div className="mb-6">
+              <AnimatedLogo 
+                className="text-4xl md:text-5xl font-[var(--font-playfair)] font-bold text-white" 
+                animateFromHeader={true}
+              />
             </div>
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#properties" className="text-slate-600 hover:text-cyan-600 transition-colors">
-                Properties
-              </a>
-              <a href="#about" className="text-slate-600 hover:text-cyan-600 transition-colors">
-                About
-              </a>
-              <a href="#contact" className="text-slate-600 hover:text-cyan-600 transition-colors">
-                Contact
-              </a>
-              <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white border-0 shadow-lg shadow-cyan-500/30">
-                List Property
-              </Button>
-            </div>
+            <motion.h1
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: {},
+                visible: {
+                  transition: { staggerChildren: 0.05, delayChildren: 0.5 },
+                },
+              }}
+              className="text-sm font-[var(--font-playfair)] font-light mb-6 text-white leading-tight max-w-3xl mx-auto"
+            >
+              {[
+                'Find',
+                'your',
+                'perfect',
+                'property',
+                'at',
+                'any',
+                'stage',
+                'of',
+                'the',
+                'process',
+              ].map((word, idx) => (
+                <motion.span
+                  key={idx}
+                  variants={{
+                    hidden: { opacity: 0, y: 12, scale: 0.98 },
+                    visible: { opacity: 1, y: 0, scale: 1 },
+                  }}
+                  transition={{ type: 'spring', stiffness: 220, damping: 22, duration: 0.5 }}
+                  className="inline-block mr-1.5 md:mr-2 text-white"
+                >
+                  {word}
+                </motion.span>
+              ))}
+            </motion.h1>
           </div>
-        </div>
-      </nav>
+          {/* Search + Filters Row (minimal) */}
+          <PropertySearchFilter
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            onSearchSubmit={handleSearch}
+            propertyType={propertyType}
+            onPropertyTypeChange={setPropertyType}
+            priceRange={priceRange}
+            onPriceRangeChange={setPriceRange}
+          />
 
-      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center space-x-2 bg-cyan-100/50 text-cyan-700 px-4 py-2 rounded-full mb-6 border border-cyan-200/50">
-              <Star className="w-4 h-4" />
-              <span className="text-sm font-medium">Find Your Perfect Space</span>
-            </div>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-slate-900 via-cyan-800 to-blue-800 bg-clip-text text-transparent leading-tight">
-              Discover Your
-              <br />
-              Dream Property
-            </h1>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Explore premium properties in prime locations. Modern living spaces designed for your lifestyle.
-            </p>
-          </div>
-
-          <div className="max-w-4xl mx-auto">
-            <Card className="border-2 border-cyan-200/50 shadow-2xl shadow-cyan-500/10 bg-white/90 backdrop-blur">
-              <CardContent className="p-6">
-                <form onSubmit={handleSearch}>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="md:col-span-2 relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <Input
-                        type="text"
-                        placeholder="Search by city, address, or title..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10 h-12 border-slate-200 focus:border-cyan-400 focus:ring-cyan-400"
-                      />
-                    </div>
-
-                    <Select value={propertyType} onValueChange={setPropertyType}>
-                      <SelectTrigger className="h-12 border-slate-200 focus:border-cyan-400 focus:ring-cyan-400">
-                        <SelectValue placeholder="Property Type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Types</SelectItem>
-                        <SelectItem value="apartment">Apartment</SelectItem>
-                        <SelectItem value="house">House</SelectItem>
-                        <SelectItem value="condo">Condo</SelectItem>
-                      </SelectContent>
-                    </Select>
-
-                    <Select value={priceRange} onValueChange={setPriceRange}>
-                      <SelectTrigger className="h-12 border-slate-200 focus:border-cyan-400 focus:ring-cyan-400">
-                        <SelectValue placeholder="Price Range" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Prices</SelectItem>
-                        <SelectItem value="0-2000">Under $2,000</SelectItem>
-                        <SelectItem value="2000-4000">$2,000 - $4,000</SelectItem>
-                        <SelectItem value="4000-6000">$4,000 - $6,000</SelectItem>
-                        <SelectItem value="6000">Over $6,000</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <Button
-                    type="submit"
-                    className="w-full mt-4 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white border-0 shadow-lg shadow-cyan-500/30"
-                  >
-                    <Search className="w-5 h-5 mr-2" />
-                    Search Properties
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="mt-12 flex flex-wrap justify-center gap-4">
-            <div className="flex items-center space-x-2 bg-white/80 backdrop-blur px-6 py-3 rounded-full border border-cyan-200/50 shadow-lg shadow-cyan-500/10">
-              <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
-              <span className="text-slate-700 font-medium">{properties.length}+ Properties Available</span>
-            </div>
-            <div className="flex items-center space-x-2 bg-white/80 backdrop-blur px-6 py-3 rounded-full border border-blue-200/50 shadow-lg shadow-blue-500/10">
-              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-              <span className="text-slate-700 font-medium">Verified Listings</span>
-            </div>
-          </div>
+          {/* App Download Section */}
+          <AppDownloadSection />
         </div>
       </section>
 
-      <section id="properties" className="py-20 px-4 sm:px-6 lg:px-8 bg-white/50">
+      <CTAFindAgent />
+
+      <section id="properties" className="py-12 px-4 sm:px-6 lg:px-8 bg-background">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-slate-900 to-cyan-800 bg-clip-text text-transparent">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl md:text-4xl momentum-heading mb-3 text-momentum-ocean-blue">
               Featured Properties
             </h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">
+            <p className="text-foreground/70 max-w-2xl mx-auto text-base">
               Handpicked properties that match your lifestyle and preferences
             </p>
           </div>
 
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <Card key={i} className="overflow-hidden animate-pulse">
-                  <div className="h-64 bg-slate-200"></div>
-                  <CardContent className="p-6">
-                    <div className="h-4 bg-slate-200 rounded mb-4"></div>
-                    <div className="h-4 bg-slate-200 rounded w-2/3"></div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : filteredProperties.length === 0 ? (
-            <div className="text-center py-20">
-              <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Home className="w-10 h-10 text-slate-400" />
-              </div>
-              <p className="text-slate-600 text-lg">No properties found matching your criteria</p>
-              <Button
-                onClick={() => {
+          <PropertyList
+            properties={filteredProperties}
+            loading={loading}
+            onViewDetails={(property) => {
+              // Handle view details
+              console.log('View details:', property);
+            }}
+            emptyMessage="No properties found matching your criteria"
+            emptyAction={{
+              label: 'Clear Filters',
+              onClick: () => {
                   setSearchQuery('');
                   setPropertyType('all');
                   setPriceRange('all');
-                }}
-                variant="outline"
-                className="mt-4 border-cyan-300 text-cyan-700 hover:bg-cyan-50"
+              },
+            }}
+            gridCols="3"
+          />
+          
+          {!loading && filteredProperties.length > 0 && (
+            <div className="flex justify-center mt-10">
+              <a 
+                href="/login" 
+                className="text-momentum-ocean-blue hover:text-momentum-ocean-blue/80 font-medium transition-colors underline-offset-4 hover:underline"
               >
-                Clear Filters
-              </Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredProperties.map((property) => (
-                <Card
-                  key={property.id}
-                  className="group overflow-hidden hover:shadow-2xl hover:shadow-cyan-500/20 transition-all duration-300 border-2 border-transparent hover:border-cyan-200 bg-white"
-                >
-                  <div className="relative h-64 overflow-hidden">
-                    <img
-                      src={property.image_url}
-                      alt={property.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    {property.featured && (
-                      <div className="absolute top-4 left-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
-                        <Star className="w-3 h-3" />
-                        <span>Featured</span>
-                      </div>
-                    )}
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-sm font-medium text-slate-700 capitalize">
-                      {property.property_type}
-                    </div>
-                  </div>
-
-                  <CardContent className="p-6">
-                    <div className="mb-4">
-                      <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-cyan-700 transition-colors">
-                        {property.title}
-                      </h3>
-                      <div className="flex items-center text-slate-600 text-sm mb-3">
-                        <MapPin className="w-4 h-4 mr-1 text-cyan-500" />
-                        {property.city}, {property.state}
-                      </div>
-                      <p className="text-slate-600 text-sm line-clamp-2">
-                        {property.description}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center justify-between mb-4 py-3 border-t border-b border-slate-100">
-                      <div className="flex items-center space-x-1 text-slate-600">
-                        <Bed className="w-4 h-4 text-cyan-500" />
-                        <span className="text-sm font-medium">{property.bedrooms}</span>
-                      </div>
-                      <div className="flex items-center space-x-1 text-slate-600">
-                        <Bath className="w-4 h-4 text-cyan-500" />
-                        <span className="text-sm font-medium">{property.bathrooms}</span>
-                      </div>
-                      <div className="flex items-center space-x-1 text-slate-600">
-                        <Square className="w-4 h-4 text-cyan-500" />
-                        <span className="text-sm font-medium">{property.area_sqft} sqft</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
-                          ${property.price.toLocaleString()}
-                        </p>
-                        <p className="text-xs text-slate-500">per month</p>
-                      </div>
-                      <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white border-0 shadow-lg shadow-cyan-500/30">
-                        View Details
-                        <ChevronRight className="w-4 h-4 ml-1" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                View more
+              </a>
             </div>
           )}
         </div>
       </section>
+      <AboutSection />
 
-      <footer className="bg-gradient-to-br from-slate-900 via-cyan-900 to-blue-900 text-white py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center">
-                  <Building2 className="w-6 h-6 text-white" />
-                </div>
-                <span className="text-xl font-bold">PropSpace</span>
-              </div>
-              <p className="text-cyan-100 max-w-md">
-                Your trusted partner in finding the perfect property. Modern living spaces designed for your lifestyle.
-              </p>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2 text-cyan-100">
-                <li><a href="#properties" className="hover:text-cyan-300 transition-colors">Properties</a></li>
-                <li><a href="#about" className="hover:text-cyan-300 transition-colors">About Us</a></li>
-                <li><a href="#contact" className="hover:text-cyan-300 transition-colors">Contact</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Contact</h4>
-              <ul className="space-y-2 text-cyan-100">
-                <li>contact@propspace.com</li>
-                <li>+1 (555) 123-4567</li>
-              </ul>
-            </div>
+<section id="carausel" className='py-10 bg-background'>
+   {/* Category Carousel */}
+   <div className="w-full relative">
+            {/* Left fade gradient */}
+            <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none"></div>
+            {/* Right fade gradient */}
+            <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none"></div>
+            
+            <Carousel
+              opts={{
+                align: 'start',
+                loop: true,
+                dragFree: true,
+                slidesToScroll: 8,
+              }}
+              className="w-full"
+              setApi={setCarouselApi}
+            >
+              <CarouselContent className="-ml-2 md:-ml-4 px-4 md:px-6">
+                {[
+                  {
+                    title: 'Apartments',
+                    icon: Building2,
+                    description: 'Modern living spaces',
+                    color: 'text-blue-400',
+                  },
+                  {
+                    title: 'Houses',
+                    icon: Home,
+                    description: 'Family homes',
+                    color: 'text-green-400',
+                  },
+                  {
+                    title: 'Luxury',
+                    icon: Star,
+                    description: 'Premium properties',
+                    color: 'text-yellow-400',
+                  },
+                  {
+                    title: 'Investment',
+                    icon: TrendingUp,
+                    description: 'High returns',
+                    color: 'text-purple-400',
+                  },
+                  {
+                    title: 'Location',
+                    icon: MapPin,
+                    description: 'Prime areas',
+                    color: 'text-red-400',
+                  },
+                  {
+                    title: 'Affordable',
+                    icon: DollarSign,
+                    description: 'Budget friendly',
+                    color: 'text-cyan-400',
+                  },
+                  {
+                    title: 'Secure',
+                    icon: Shield,
+                    description: 'Safe & protected',
+                    color: 'text-indigo-400',
+                  },
+                  {
+                    title: 'Commercial',
+                    icon: Briefcase,
+                    description: 'Business spaces',
+                    color: 'text-orange-400',
+                  },
+                  {
+                    title: 'Community',
+                    icon: Users,
+                    description: 'Great neighborhoods',
+                    color: 'text-pink-400',
+                  },
+                  {
+                    title: 'New Listings',
+                    icon: Key,
+                    description: 'Fresh properties',
+                    color: 'text-teal-400',
+                  },
+                ].map((category, index) => {
+                  const IconComponent = category.icon;
+                  return (
+                     <CarouselItem key={index} className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-[12.5%] min-w-[12.5%]">
+                       <Card className="border border-momentum-pale-violet/20 bg-white/80 backdrop-blur-sm hover:shadow-lg hover:bg-white transition-all duration-200 h-full rounded-momentum">
+                         <CardContent className="p-6 flex flex-col items-center justify-center text-center space-y-4">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white ${
+                            index % 5 === 0 ? 'bg-momentum-ocean-blue' :
+                            index % 5 === 1 ? 'bg-momentum-pale-violet' :
+                            index % 5 === 2 ? 'bg-momentum-powder-pink' :
+                            index % 5 === 3 ? 'bg-momentum-crayola-yellow' :
+                            'bg-momentum-diamond-blue'
+                          }`}>
+                            <IconComponent className="w-6 h-6" />
+                          </div>
+                          <div className="space-y-1">
+                            <h3 className="font-semibold text-momentum-ocean-blue text-sm leading-tight">
+                              {category.title}
+                            </h3>
+                            <p className="text-xs text-foreground/70 leading-relaxed">
+                              {category.description}
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </CarouselItem>
+                  );
+                })}
+              </CarouselContent>
+            </Carousel>
           </div>
+</section>
+      
 
-          <div className="border-t border-cyan-800 pt-8 text-center text-cyan-200">
-            <p>© 2024 PropSpace. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <ContactSection />
+      <Footer />
     </div>
   );
 }

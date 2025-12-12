@@ -9,6 +9,23 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontSize: {
+        'xs': ['0.75rem', { lineHeight: '1rem' }],      // 12px
+        'sm': ['0.875rem', { lineHeight: '1.25rem' }],  // 14px
+        'base': ['0.875rem', { lineHeight: '1.5rem' }], // 14px (reduced from 16px)
+        'lg': ['1rem', { lineHeight: '1.75rem' }],      // 16px (reduced from 18px)
+        'xl': ['1.125rem', { lineHeight: '1.75rem' }],  // 18px (reduced from 20px)
+        '2xl': ['1.5rem', { lineHeight: '2rem' }],      // 24px (reduced from 30px)
+        '3xl': ['1.875rem', { lineHeight: '2.25rem' }], // 30px (reduced from 36px)
+        '4xl': ['2.25rem', { lineHeight: '2.5rem' }],   // 36px (reduced from 48px)
+        '5xl': ['3rem', { lineHeight: '1' }],           // 48px (reduced from 60px)
+      },
+      spacing: {
+        '18': '4.5rem',   // 72px
+        '22': '5.5rem',   // 88px
+        '26': '6.5rem',   // 104px
+        '30': '7.5rem',   // 120px
+      },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic':
@@ -18,6 +35,12 @@ const config: Config = {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+        'momentum': '0.625rem', // Reduced from 0.75rem
+      },
+      fontFamily: {
+        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-playfair)', 'serif'],
+        brand: ['var(--font-playfair)', 'serif'], // For Momentum branding
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -59,6 +82,14 @@ const config: Config = {
           '3': 'hsl(var(--chart-3))',
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
+        },
+        // Momentum Brand Colors
+        momentum: {
+          'ocean-blue': '#366DF1',
+          'pale-violet': '#1ce1a5',
+          'powder-pink': '#FF97E8',
+          'crayola-yellow': '#FFEA7D',
+          'diamond-blue': '#B4F6FF',
         },
       },
       keyframes: {

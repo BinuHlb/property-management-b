@@ -1,4 +1,4 @@
-# PropSpace - Property Management System
+# Ari - Property Management System
 
 A modern, elegant property management system with a beautiful landing page featuring pastel cyberpunk aesthetics. Built with Next.js, TypeScript, Tailwind CSS, and Supabase.
 

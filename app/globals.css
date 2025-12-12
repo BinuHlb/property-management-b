@@ -18,31 +18,39 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    /* Momentum Design System - Base Colors */
+    --background: 220 100% 98%; /* Light purplish-blue background */
+    --foreground: 220 30% 15%; /* Dark text for contrast */
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 220 30% 15%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
+    --popover-foreground: 220 30% 15%;
+    --primary: 220 87% 58%; /* Ocean Blue #366DF1 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 162 60% 85%; /* Powder Pink #1ce1a5 - lighter variant */
+    --secondary-foreground: 220 30% 15%;
+    --muted: 220 20% 95%;
+    --muted-foreground: 220 10% 45%;
+    --accent: 162 78% 50%; /* Powder Pink #1ce1a5 - updated color */
+    --accent-foreground: 220 30% 15%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    --border: 220 20% 85%;
+    --input: 220 20% 90%;
+    --ring: 220 87% 58%; /* Ocean Blue */
+    --chart-1: 220 87% 58%; /* Ocean Blue */
+    --chart-2: 162 78% 50%; /* Pale Violet - updated to match new color */
+    --chart-3: 162 78% 50%; /* Powder Pink */
+    --chart-4: 50 100% 75%; /* Crayola Yellow */
+    --chart-5: 190 100% 85%; /* Diamond Blue */
+    --radius: 0.75rem; /* Momentum rounded corners */
+    
+    /* Momentum Brand Color Variables */
+    --momentum-ocean-blue: #366DF1;
+    --momentum-pale-violet: #1ce1a5;
+    --momentum-powder-pink: #FF97E8;
+    --momentum-crayola-yellow: #FFEA7D;
+    --momentum-diamond-blue: #B4F6FF;
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -76,7 +84,49 @@
   * {
     @apply border-border;
   }
+  html {
+    font-size: 14px; /* Reduced from default 16px */
+  }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    font-size: 0.875rem; /* 14px base */
+    line-height: 1.5;
+  }
+  
+  /* Momentum Brand Typography */
+  .momentum-brand {
+    font-family: var(--font-playfair), serif;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+  
+  .momentum-heading {
+    font-family: var(--font-playfair), serif;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  
+  /* Apply Momentum heading font to all titles globally */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-playfair), serif;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  
+  /* Momentum decorative dot */
+  .momentum-dot {
+    position: relative;
+  }
+  
+  .momentum-dot::before {
+    content: '';
+    position: absolute;
+    top: -0.3em;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0.4em;
+    height: 0.4em;
+    background-color: var(--momentum-diamond-blue);
+    border-radius: 50%;
   }
 }
