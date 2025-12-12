@@ -18,15 +18,21 @@ export function CTAFindAgent() {
             </p>
             <div className="flex flex-wrap items-center gap-6">
               <div className="flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-momentum-ocean-blue" />
+                <div className="w-8 h-8 rounded-full bg-momentum-ocean-blue flex items-center justify-center shadow-sm">
+                  <Briefcase className="w-4 h-4 text-white" />
+                </div>
                 <span className="text-sm text-foreground/70">Expert Agents</span>
               </div>
               <div className="flex items-center gap-2">
-                <Star className="w-5 h-5 text-momentum-crayola-yellow fill-momentum-crayola-yellow" />
+                <div className="w-8 h-8 rounded-full bg-momentum-crayola-yellow flex items-center justify-center shadow-sm">
+                  <Star className="w-4 h-4 text-momentum-ocean-blue fill-momentum-ocean-blue" />
+                </div>
                 <span className="text-sm text-foreground/70">Top Rated</span>
               </div>
               <div className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-momentum-powder-pink" />
+                <div className="w-8 h-8 rounded-full bg-momentum-powder-pink flex items-center justify-center shadow-sm">
+                  <Users className="w-4 h-4 text-white" />
+                </div>
                 <span className="text-sm text-foreground/70">10,000+ Clients</span>
               </div>
             </div>
