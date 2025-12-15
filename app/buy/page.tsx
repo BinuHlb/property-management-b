@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Bed, Bath, Square, MapPin, ChevronRight, Home, Star, Filter } from 'lucide-react';
 import { supabase, type Property } from '@/lib/supabase';
+import { mockProperties } from '@/lib/mock-properties';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Header } from '@/app/layout/Header';
@@ -36,18 +37,47 @@ export default function BuyPage() {
 
   const fetchProperties = async () => {
     try {
-      const { data, error } = await supabase
-        .from('properties')
-        .select('*')
-        .eq('status', 'available')
-        .order('featured', { ascending: false })
-        .order('created_at', { ascending: false });
+      // Check if Supabase is configured
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+      
+      const isSupabaseConfigured = 
+        supabaseUrl && 
+        supabaseUrl !== 'https://example.supabase.co' &&
+        supabaseKey &&
+        supabaseKey !== 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example';
 
-      if (error) throw error;
-      setProperties(data || []);
-      setFilteredProperties(data || []);
+      if (isSupabaseConfigured) {
+        const { data, error } = await supabase
+          .from('properties')
+          .select('*')
+          .eq('status', 'available')
+          .order('featured', { ascending: false })
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          setProperties(data);
+          setFilteredProperties(data);
+        } else {
+          console.warn('No properties found in Supabase, using mock data');
+          const mockBuyProperties = mockProperties.filter(p => p.status === 'available');
+          setProperties(mockBuyProperties);
+          setFilteredProperties(mockBuyProperties);
+        }
+      } else {
+        console.warn('Supabase not configured, using mock data');
+        const mockBuyProperties = mockProperties.filter(p => p.status === 'available');
+        setProperties(mockBuyProperties);
+        setFilteredProperties(mockBuyProperties);
+      }
     } catch (error) {
       console.error('Error fetching properties:', error);
+      console.warn('Falling back to mock data due to error');
+      const mockBuyProperties = mockProperties.filter(p => p.status === 'available');
+      setProperties(mockBuyProperties);
+      setFilteredProperties(mockBuyProperties);
     } finally {
       setLoading(false);
     }
