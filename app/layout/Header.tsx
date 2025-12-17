@@ -19,7 +19,7 @@ export function Header({ isDarkMode = false }: HeaderProps) {
         <div className="flex justify-between items-center h-14">
           <div className="flex items-center space-x-6">
             <Link href="/" className="cursor-pointer">
-              <Logo className={`text-xl ${isDarkMode ? 'text-white' : ''}`} />
+              <Logo isDarkMode={isDarkMode} />
             </Link>
             <div className="hidden md:flex items-center space-x-4">
               <Link 

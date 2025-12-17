@@ -2,7 +2,6 @@
 
 import { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { AnimatedLogo } from '@/components/animated-logo';
 import { PropertySearchFilter } from '@/components/features/property/property-search-filter';
 import { AppDownloadSection } from '@/components/app-download-section';
 
@@ -67,13 +66,12 @@ export function HeroSection({
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-slate-900/80" />
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Hero Title with Logo Animation */}
+        {/* Hero Title */}
         <div className="text-center my-8">
           <div className="mb-6">
-            <AnimatedLogo 
-              className="text-4xl md:text-5xl font-[var(--font-playfair)] font-bold text-white" 
-              animateFromHeader={true}
-            />
+            <span className="text-4xl md:text-5xl font-[var(--font-playfair)] font-bold text-white">
+              Ari
+            </span>
           </div>
           <motion.h1
             initial="hidden"

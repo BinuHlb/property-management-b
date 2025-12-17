@@ -8,26 +8,29 @@ type LogoProps = {
   iconClassName?: string;
   iconSrc?: string;
   alt?: string;
+  isDarkMode?: boolean;
 };
 
 export function Logo({
   className,
   iconClassName,
-  iconSrc = '/assets/icons/ari-icon.svg',
+  iconSrc,
   alt = 'Ari icon',
+  isDarkMode = false,
 }: LogoProps) {
+  // Use logo-dark.svg for light headers, logo.svg for dark headers
+  const defaultIconSrc = iconSrc || (isDarkMode ? '/assets/icons/logo.svg' : '/assets/icons/logo-dark.svg');
   return (
-    <span className={cn('relative inline-flex items-center font-medium text-foreground group cursor-pointer', className)}>
-      Ari
+    <div className={cn('inline-flex items-center cursor-pointer', className)}>
       <Image
-        src={iconSrc}
+        src={defaultIconSrc}
         alt={alt}
-        width={16}
-        height={16}
-        className={cn('absolute -right-4 -top-2 h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300', iconClassName)}
+        width={120}
+        height={120}
+        className={cn('h-8 w-auto', iconClassName)}
         priority
       />
-    </span>
+    </div>
   );
 }
 

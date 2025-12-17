@@ -37,7 +37,7 @@ export default function LoginPage() {
         
         <div className="relative z-10 flex flex-col justify-center items-center p-12 text-white mx-auto">
           <div className="max-w-md space-y-6">
-            <Logo className="text-2xl mb-6 text-momentum-diamond-blue" />
+            <Logo iconSrc="/assets/icons/logo.svg" className="text-2xl mb-6 text-momentum-diamond-blue" />
             <h2 className="text-[3.25rem] font-bold leading-tight text-white">
               Find your perfect property
             </h2>
